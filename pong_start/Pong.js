@@ -40,7 +40,7 @@ function startup() {
     initGL();
     window.addEventListener('keyup', onKeyup, false);
     window.addEventListener('keydown', onKeydown, false);
-    //draw();
+    //();
     requestAnimationFrame(draw);
 }
 

@@ -14,8 +14,17 @@
 function WireFrameCube(gl, color) {
     function defineVertices(gl) {
         // define the vertices of the cube
+
+        // Create a cube
         var vertices = [
-            // TODO
+            -1, -1, -1,
+            1, -1, -1,
+            1,  1, -1,
+            -1,  1, -1,
+            -1, -1,  1,
+            1, -1,  1,
+            1,  1,  1,
+            -1,  1,  1,
         ];
         var buffer  = gl.createBuffer();
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
@@ -27,7 +36,18 @@ function WireFrameCube(gl, color) {
     function defineEdges(gl) {
         // define the edges for the cube, there are 12 edges in a cube
         var vertexIndices = [
-            // TODO
+            0, 1,
+            1, 2,
+            2, 3,
+            3, 0,
+            4, 5,
+            5, 6,
+            6, 7,
+            7, 4,
+            0, 4,
+            1, 5,
+            2, 6,
+            3, 7,
         ];
         var buffer = gl.createBuffer();
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer);
