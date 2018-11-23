@@ -61,7 +61,7 @@ function WireFrameCube(gl, color) {
         color: color,
 
         draw: function(gl, aVertexPositionId, aVertexColorId) {
-            ...
+            // ...
 
         }
     }
