@@ -34,6 +34,7 @@ var ctx = {
 };
 
 // loaded textures
+// keep texture parameters in an object so we can mix textures and objects
 var textures = {
     textureObject0: {}
 };
@@ -46,7 +47,7 @@ var scene = {
     nearPlane: 0.1,
     farPlane: 30.0,
     fov: 40,
-    lightPosition: [-20, 20, 0],
+    lightPosition: [20, 10, 0],
     lightColor: [1, 1, 1],
     rotateObjects: true,
     angle: 0,
@@ -79,6 +80,7 @@ function initGL() {
     "use strict";
     ctx.shaderProgram = loadAndCompileShaders(gl, 'VertexShader.glsl', 'FragmentShaderLighting.glsl');
     setUpAttributesAndUniforms();
+
     defineObjects();
 
     gl.enable(gl.DEPTH_TEST);
@@ -91,6 +93,7 @@ function initGL() {
  * @param textureObject WebGL Texture Object
  */
 function initTexture(image, textureObject) {
+    console.log("INFO: init Texture");
     // create a new texture
     gl.bindTexture(gl.TEXTURE_2D, textureObject);
 
@@ -99,6 +102,7 @@ function initTexture(image, textureObject) {
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+
     gl.generateMipmap(gl.TEXTURE_2D);
 
     // turn texture off again
@@ -109,12 +113,15 @@ function initTexture(image, textureObject) {
  * Load an image as a texture
  */
 function loadTexture() {
+    console.log("INFO: loading Texture");
     var image = new Image();
     // create a texture object
     textures.textureObject0 = gl.createTexture();
     image.onload = function() {
-        console.log("Image loaded");
+        console.log("INFO: Image loaded");
         initTexture(image, textures.textureObject0);
+        // make sure there is a redraw after the loading of the texture
+        // draw();
     };
     // setting the src will trigger onload
     image.src = "lena512.png";
@@ -130,6 +137,7 @@ function defineObjects() {
         [0.0, 1.0, 1.0],
         [1.0, 0.0, 1.0]);
     drawingObjects.solidSphere = new SolidSphere(gl, 40, 40);
+
 }
 
 /**
@@ -159,6 +167,7 @@ function setUpAttributesAndUniforms(){
  * Draw the scene.
  */
 function draw() {
+    // console.log("INFO: start draw()")
     "use strict";
     var modelViewMatrix = mat4.create();
     var viewMatrix = mat4.create();
@@ -172,25 +181,28 @@ function draw() {
     mat4.lookAt(viewMatrix, scene.eyePosition, scene.lookAtPosition, scene.upVector);
 
     mat4.perspective(projectionMatrix,
-        glMatrix.toRadian(40),
+        glMatrix.toRadian(66),
         gl.drawingBufferWidth / gl.drawingBufferHeight,
         scene.nearPlane, scene.farPlane);
     //mat4.ortho(projectionMatrix, -2.0, 2.0, -2.0, 2.0, scene.nearPlane, scene.farPlane);
 
-
     // enable the texture mapping
+    // Tell WebGL we want to affect texture unit 0
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, textures.textureObject0);
     gl.uniform1i(ctx.uSamplerId, 0);
     gl.uniformMatrix3fv(ctx.uTextureMatrixId, false, textureMatrix);
 
     // tell the fragment shader to use the texture
-    gl.uniform1i(ctx.uEnableTextureId, 1);
-
+    // 1 = texture is active
+    // 0 = texture is inactive
+    gl.uniform1i(ctx.uEnableTextureId, 0);
     gl.uniformMatrix3fv(ctx.uTextureMatrixId, false, textureMatrix);
 
-
     // set the light
+    // tell the fragment shader to use the lighting
+    // 1 = lightning is active
+    // 0 = lightning is inactive
     gl.uniform1i(ctx.uEnableLightingId, 1);
     gl.uniform3fv(ctx.uLightPositionId, scene.lightPosition);
     gl.uniform3fv(ctx.uLightColorId, scene.lightColor);
@@ -204,9 +216,8 @@ function draw() {
     gl.uniformMatrix4fv(ctx.uModelViewMatrixId, false, modelViewMatrix);
     mat3.normalFromMat4(normalMatrix, modelViewMatrix);
     gl.uniformMatrix3fv(ctx.uNormalMatrixId, false, normalMatrix);
-    //drawingObjects.wiredCube.draw(gl, ctx.aVertexPositionId, ctx.aVertexColorId);
+    drawingObjects.wiredCube.draw(gl, ctx.aVertexPositionId, ctx.aVertexColorId);
     drawingObjects.solidCube.draw(gl, ctx.aVertexPositionId, ctx.aVertexColorId, ctx.aVertexNormalId);
-
 
     // translate and rotate objects
     mat4.translate(modelViewMatrix, viewMatrix, [-1.0, 0, 0]);
@@ -243,7 +254,7 @@ function drawAnimated ( timeStamp ) {
     if (scene.angle > 2.0*Math.PI) {
         scene.angle -= 2.0*Math.PI;
     }
-    draw ();
+    draw();
     // request the next frame
     window.requestAnimationFrame (drawAnimated);
 }
