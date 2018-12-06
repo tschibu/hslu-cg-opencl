@@ -47,7 +47,7 @@ var scene = {
     nearPlane: 0.1,
     farPlane: 30.0,
     fov: 40,
-    lightPosition: [20, 10, 0],
+    lightPosition: [-20, 20, 0],
     lightColor: [1, 1, 1],
     rotateObjects: true,
     angle: 0,
@@ -116,11 +116,9 @@ function loadTexture() {
     var image = new Image();
     // create a texture object
     textures.textureObject0 = gl.createTexture();
-    gl.bindTexture(gl.TEXTURE_2D, textures.textureObject0);
-
+    //gl.bindTexture(gl.TEXTURE_2D, textures.textureObject0);
     // Fill the texture with a 1x1 blue pixel.
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-        new Uint8Array([0, 0, 255, 255]));
+    //gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE, new Uint8Array([82, 100, 110, 255]));
     image.onload = function() {
         console.log("INFO: Image loaded");
         initTexture(image, textures.textureObject0);
@@ -259,7 +257,7 @@ function drawAnimated ( timeStamp ) {
     if (scene.angle > 2.0*Math.PI) {
         scene.angle -= 2.0*Math.PI;
     }
-    draw();
+    draw ();
     // request the next frame
     window.requestAnimationFrame (drawAnimated);
 }
